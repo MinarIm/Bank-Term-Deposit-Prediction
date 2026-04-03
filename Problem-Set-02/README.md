@@ -48,7 +48,7 @@ A banking institution wants to predict whether a customer will **subscribe to a 
 ## Project Structure
 
 ```
-Bank/
+Problem-Set-02/
 ├── data/
 │   └── bank-full.csv
 ├── src/
@@ -77,6 +77,7 @@ Bank/
 ### Step 1 — Load Data (`data_loader.py`)
 
 Loads `bank-full.csv` using `pd.read_csv` with semicolon separator and prints:
+
 - Shape, first 5 rows, data types
 - Missing values check → **0 missing values**
 - Numerical statistics (mean, std, min, max)
@@ -86,6 +87,7 @@ Loads `bank-full.csv` using `pd.read_csv` with semicolon separator and prints:
 ### Step 2 — Exploratory Data Analysis (`evaluator.py`)
 
 6-panel visual saved as `eda_overview.png`:
+
 - Target class distribution (donut chart)
 - Age and call duration distributions by outcome (KDE)
 - Subscription rate by job type
@@ -93,7 +95,8 @@ Loads `bank-full.csv` using `pd.read_csv` with semicolon separator and prints:
 - Numerical correlation heatmap
 
 **Key EDA Findings:**
-- **Class imbalance**: 88.3% No vs 11.7% Yes
+
+- **Class imbalance:** 88.3% No vs 11.7% Yes
 - **Call duration** is the strongest indicator — longer calls = more likely to subscribe
 - **Students & retired** customers have the highest subscription rates
 - **Mar, Sep, Oct, Dec** months show notably higher subscription rates
@@ -104,7 +107,8 @@ Loads `bank-full.csv` using `pd.read_csv` with semicolon separator and prints:
 
 **Binary columns** (`default`, `housing`, `loan`, `y`) → integer map: `no=0, yes=1`
 
-**Multi-class categorical columns** → **one-hot encoding** via `pd.get_dummies` with `drop_first=True`:
+**Multi-class categorical columns** → one-hot encoding via `pd.get_dummies` with `drop_first=True`:
+
 - Columns encoded: `job`, `marital`, `education`, `contact`, `month`, `poutcome`
 - `drop_first=True` removes one dummy per group to **avoid the dummy variable trap** (multicollinearity)
 - Feature count after encoding: **42 features**
@@ -114,6 +118,7 @@ Loads `bank-full.csv` using `pd.read_csv` with semicolon separator and prints:
 ```python
 train_test_split(X, y, test_size=0.20, random_state=42, stratify=y)
 ```
+
 - **80%** training (36,168 samples) / **20%** test (9,043 samples)
 - `stratify=y` ensures both sets preserve the original 88:12 class ratio
 
@@ -131,7 +136,7 @@ Training size after oversampling: 63,874 samples
 
 ### Step 6 — Feature Scaling (`preprocessor.py`)
 
-```python
+```
 StandardScaler: z = (x − μ) / σ   →   mean ≈ 0, std ≈ 1
 ```
 
@@ -142,6 +147,7 @@ StandardScaler: z = (x − μ) / σ   →   mean ≈ 0, std ≈ 1
 ### Step 7 — Build Model (`model.py`)
 
 **Model equation:**
+
 ```
 P(y=1 | X) = σ(β₀ + β₁x₁ + β₂x₂ + … + β₄₂x₄₂)
 where  σ(z) = 1 / (1 + e^{−z})   [sigmoid function]
@@ -157,7 +163,7 @@ Decision: predict 'Yes' (1) if P ≥ 0.5, else 'No' (0)
 | `C` | `1.0` | Moderate L2 regularisation (inverse of λ) |
 | `random_state` | `42` | Reproducibility |
 
-Note: `class_weight` is not set because oversampling already balances the training data to a 1:1 ratio.
+> **Note:** `class_weight` is not set because oversampling already balances the training data to a 1:1 ratio.
 
 ### Step 8 — Train Model (`model.py`)
 
@@ -183,13 +189,13 @@ model.fit(X_train_sc, y_train_balanced)
 ### Step 10 — Predict on Test Set (`main.py`)
 
 ```python
-y_pred = model.predict(X_test_sc)         # class labels
+y_pred = model.predict(X_test_sc)              # class labels
 y_prob = model.predict_proba(X_test_sc)[:, 1]  # probability of Yes
 ```
 
 ### Step 11 — Evaluate (`evaluator.py`)
 
-All plots and metrics computed and saved.
+All plots and metrics computed and saved to the `outputs/` folder.
 
 ### Step 12 — Save Outputs (`model.py` + `evaluator.py`)
 
@@ -209,7 +215,7 @@ Model coefficients, CV scores, and all metrics saved to JSON files.
 | Specificity | Recall for No — how many actual non-subscribers were correctly rejected |
 | Confusion Matrix | Full breakdown of TP, TN, FP, FN |
 
-**Why ROC-AUC over Accuracy?** A classifier predicting "No" for everyone achieves ~88% accuracy but zero utility. ROC-AUC and Average Precision are far more meaningful metrics for imbalanced classification.
+> **Why ROC-AUC over Accuracy?** A classifier predicting "No" for everyone achieves ~88% accuracy but zero utility. ROC-AUC and Average Precision are far more meaningful metrics for imbalanced classification.
 
 ---
 
@@ -262,7 +268,7 @@ weighted avg       0.91      0.84      0.86      9043
 2. **Previous campaign success** (`poutcome_success`) is a powerful positive signal — customers who subscribed before are likely to subscribe again.
 3. **Housing loan** (`housing`) is a negative predictor — customers with a housing loan are less likely to subscribe, likely due to existing financial commitments.
 4. **Month effects** are significant — March, September, October and December outperform May for subscription rates.
-5. **Random oversampling** substantially improved Recall for the positive class (from ~80% to ~82%) without sacrificing overall accuracy.
+5. **Random oversampling** substantially improved Recall for the positive class without sacrificing overall accuracy.
 6. **Stable cross-validation** — std of only ±0.0019 across 5 folds confirms the model generalises well and is not overfitting.
 
 ---
