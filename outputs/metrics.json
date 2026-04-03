@@ -1,0 +1,15 @@
+{
+  "Accuracy": 0.8444,
+  "ROC-AUC": 0.9076,
+  "Average Precision": 0.537,
+  "F1-Score (Yes)": 0.5509,
+  "Sensitivity/Recall": 0.8157,
+  "Specificity": 0.8482,
+  "Precision (Yes)": 0.4159,
+  "CV ROC-AUC Mean": 0.9102,
+  "CV ROC-AUC Std": 0.0019,
+  "True Negatives": 6773,
+  "False Positives": 1212,
+  "False Negatives": 195,
+  "True Positives": 863
+}
